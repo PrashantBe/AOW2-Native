@@ -45,6 +45,8 @@ The game was made for a touch screen. The left stick moves a pointer that acts a
 | Keys 7 and 9 in selection panels | R2 + L1, R2 + R1 | 7, 9 |
 | Quit | Select + Start | Esc |
 
+On handhelds without an analog stick, the launcher switches the D-pad to moving the pointer (`--dpad-pointer`); touch near a screen edge to scroll.
+
 Answer ✓ to the game's "Sound on?" question for music, or start with `--mute`.
 
 ## Build
@@ -61,9 +63,10 @@ ctest --test-dir build        # boots the game headless to its main menu
 For the handheld, with Docker:
 
 ```sh
-tools/arm64/build.sh      # cross-compiles build-arm64/aow2 (Debian 12; needs glibc 2.36+ on the device)
-tools/arm64/test.sh       # boots that binary to the main menu under QEMU
+tools/arm64/build.sh      # cross-compiles build-arm64/aow2 on Ubuntu 20.04 (needs glibc 2.29+)
+tools/arm64/test.sh       # boots it to the main menu under QEMU in an Ubuntu 20.04 ARM64 userland
 port/make-package.sh      # assembles dist/ for roms/ports/
+tools/portmaster-check.sh # runs PortMaster's own check and builds dist/artofwar2.zip
 ```
 
 The ARM64 binary is about 1.6 MB and needs only SDL2 and the C library from the device. `./build/aow2` with no arguments lists all options, including a headless mode driven by commands for automated testing.
@@ -79,7 +82,7 @@ The ARM64 binary is about 1.6 MB and needs only SDL2 and the C library from the 
 
 ## Status
 
-Tested on an RG40XXV with KNULLI: the game plays, including base building, training, menus, saves and music. Not yet tested on other firmware, or through all seven missions. See the [roadmap](docs/Work%20-%20Native%20port%20roadmap.md) and [PortMaster publishing notes](docs/Work%20-%20Publishing%20on%20PortMaster.md).
+Tested on an RG40XXV with KNULLI: the game plays, including base building, training, menus, saves and music. Built against Ubuntu 20.04 (glibc 2.29+) so it should start on every current firmware, and checked at 640×480, 1280×720, 720×720 and 480×320. Not yet tested on other firmware on real hardware, or through all seven missions. See the [roadmap](docs/Work%20-%20Native%20port%20roadmap.md), [firmware testing guide](docs/Work%20-%20Testing%20on%20other%20firmware.md) and [PortMaster publishing notes](docs/Work%20-%20Publishing%20on%20PortMaster.md).
 
 ## Credits
 

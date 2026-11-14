@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.16)
 project(aow2_native LANGUAGES CXX)
 
 # The earlier hand-written prototype is kept only in local copies of the project.

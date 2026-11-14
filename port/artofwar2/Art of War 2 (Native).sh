@@ -38,6 +38,9 @@ export SDL_GAMECONTROLLERCONFIG="$sdl_controllerconfig"
 # gptokeyb only provides the Select+Start exit hotkey here. The game reads the controller itself.
 $GPTOKEYB "aow2.${DEVICE_ARCH}" &
 pm_platform_helper "$GAMEDIR/aow2.${DEVICE_ARCH}"
-"./aow2.${DEVICE_ARCH}" "$JAR" --fullscreen --saves "$GAMEDIR/saves"
+# Devices without an analog stick steer the pointer with the D-pad.
+ARGS=""
+[ "${ANALOG_STICKS:-1}" = "0" ] && ARGS="--dpad-pointer"
+"./aow2.${DEVICE_ARCH}" "$JAR" --fullscreen --saves "$GAMEDIR/saves" $ARGS
 
 pm_finish

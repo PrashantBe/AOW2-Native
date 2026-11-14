@@ -24,14 +24,14 @@ Work through one numbered item at a time. Add or update its own `docs/Work - {ta
 | --- | --- | --- |
 | 01 | Java runtime and phone API — Complete | Original game boots, reaches menus and the campaign, and runs a battle. All 8 checks pass. |
 | 02 | Gameplay check on PC — Complete for the Mission 1 opening | Selection, build menu, footprint placement, construction, power, save, and load after a restart all work. |
-| 03 | ARM64 build — Complete | Reproducible Docker cross-build. The binary needs only SDL2 and glibc 2.36 and boots to the main menu under ARM emulation. |
+| 03 | ARM64 build — Complete | Reproducible Docker cross-build on Ubuntu 20.04. The binary needs only SDL2 and glibc 2.29, and boots in an Ubuntu 20.04 ARM64 userland (SDL 2.0.10) under emulation. |
 | 04 | Test on the RG40XXV — Complete | Runs from Ports on KNULLI scarab (glibc 2.40): menus, base building, unit training panel and music confirmed on the device. |
 | 05 | Music — Complete | The MIDI track plays through a built-in synthesizer after "Sound on?" is accepted, and follows the game's volume. |
 | 06 | Full playthrough | Play all seven missions and the offline Custom Game mode. Log runtime errors or wrong behavior. |
 | 07 | System-font text | The game falls back to the phone's font in a few places (`drawString`). Render it. |
-| 08 | Controls polish — Number keys done | L1, R1 and Select send the phone keys 1 (rally point), 3 (destroy) and 0 (info); R2 + L1/R1 send 7 and 9. Still to tune: pointer speed and edge scrolling on the device. |
+| 08 | Controls polish — Number keys and D-pad pointer done | L1, R1 and Select send the phone keys 1 (rally point), 3 (destroy) and 0 (info); R2 + L1/R1 send 7 and 9. Devices without a stick use the D-pad as the pointer. Still to tune: pointer speed and edge scrolling on the device. |
 | 09 | Game-data redistribution decision | Contact the rights holder. Without permission, the release stays "bring your own JAR". |
-| 10 | PortMaster package and submission | Port folder is ready in `port/artofwar2`. Still needed: testing on other firmware, then the pull request. See [Work - Publishing on PortMaster](Work%20-%20Publishing%20on%20PortMaster.md). |
+| 10 | PortMaster package and submission | Port folder is ready in `port/artofwar2`. Still needed: testing on other firmware (see [Work - Testing on other firmware](Work%20-%20Testing%20on%20other%20firmware.md)), then the pull request. See [Work - Publishing on PortMaster](Work%20-%20Publishing%20on%20PortMaster.md). |
 
 ## PortMaster references
 

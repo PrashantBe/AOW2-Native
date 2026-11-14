@@ -33,11 +33,14 @@ struct Options {
     unsigned long long minFrames = 0; // Headless runs fail when fewer frames were painted.
     int scale = 1;
     bool fullscreen = false;
+    bool dpadPointer = false; // For handhelds without an analog stick.
+    int windowWidth = 0, windowHeight = 0;
     bool mute = false;
     std::string musicWav; // Render the music to this file and exit.
     struct Shot { double at; std::string path; };
     struct Input { double at; char kind; int a, b; }; // kind: p press, r release, d drag, k key down, u key up
     std::vector<Shot> shots;
+    std::vector<Shot> windowShots; // Whole window, including scaling and borders.
     std::vector<Input> inputs;
 };
 
@@ -48,6 +51,8 @@ struct Options {
         "  --size <w>x<h>          screen size reported to the game (default: 640x360)\n"
         "  --scale <n>             window size multiplier\n"
         "  --fullscreen            fill the display, keeping the game's shape\n"
+        "  --window <w>x<h>        window size\n"
+        "  --dpad-pointer          the D-pad moves the pointer (for devices without a stick)\n"
         "  --verbose               log platform calls\n"
         "Testing without a window:\n"
         "  --headless <seconds>    run for this long on the game clock, then exit\n"
@@ -56,6 +61,7 @@ struct Options {
         "  --tap <seconds>:<x>,<y> touch and release a point\n"
         "  --key <seconds>:<code>  press and release a key code\n"
         "  --min-frames <n>        exit with an error if fewer frames were painted\n"
+        "  --window-shot <s>:<png> save the whole window at a time\n"
         "  --commands              read tap, press, release, drag, key, shot and quit\n"
         "                          commands from standard input, one per line\n");
     std::exit(2);
@@ -76,6 +82,15 @@ Options parse(int argc, char** argv, vm::Host& host) {
         else if (arg == "--saves") host.saveDirectory = value();
         else if (arg == "--scale") options.scale = std::max(1, std::atoi(value().c_str()));
         else if (arg == "--fullscreen") options.fullscreen = true;
+        else if (arg == "--dpad-pointer") options.dpadPointer = true;
+        else if (arg == "--window") {
+            if (std::sscanf(value().c_str(), "%dx%d", &options.windowWidth, &options.windowHeight) != 2) usage();
+        } else if (arg == "--window-shot") {
+            const auto text = value();
+            const auto colon = text.find(':');
+            if (colon == std::string::npos) usage();
+            options.windowShots.push_back({std::atof(text.c_str()), text.substr(colon + 1)});
+        }
         else if (arg == "--mute") options.mute = true;
         else if (arg == "--music-wav") options.musicWav = value();
         else if (arg == "--size") {
@@ -278,6 +293,19 @@ int runHeadless(Options& options, Game& game, vm::Host& host) {
     return host.frameCount < options.minFrames ? 1 : 0;
 }
 
+// Saves what the display shows, at its real size, borders included.
+void saveWindow(SDL_Renderer* renderer, const std::string& path, const vm::Host& host) {
+    int width = 0, height = 0;
+    SDL_GetRendererOutputSize(renderer, &width, &height);
+    vm::Surface surface;
+    surface.resize(width, height, 0);
+    SDL_RenderSetLogicalSize(renderer, 0, 0);
+    SDL_RenderSetViewport(renderer, nullptr);
+    SDL_RenderReadPixels(renderer, nullptr, SDL_PIXELFORMAT_ARGB8888, surface.pixels.data(), width * 4);
+    SDL_RenderSetLogicalSize(renderer, host.width, host.height);
+    savePng(surface, path);
+}
+
 int runWindow(Options& options, Game& game, vm::Host& host) {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
         throw std::runtime_error(SDL_GetError());
@@ -300,13 +328,21 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
         }
     }
     auto* window = SDL_CreateWindow("Art of War 2", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    host.width * options.scale, host.height * options.scale,
+                                    options.windowWidth > 0 ? options.windowWidth : host.width * options.scale,
+                                    options.windowHeight > 0 ? options.windowHeight : host.height * options.scale,
                                     options.fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : SDL_WINDOW_RESIZABLE);
     auto* renderer = window ? SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : nullptr;
     if (!renderer && window) renderer = SDL_CreateRenderer(window, -1, 0);
     if (!renderer) throw std::runtime_error(SDL_GetError());
     // The game's screen keeps its shape. Any spare room on the display is left black.
     SDL_RenderSetLogicalSize(renderer, host.width, host.height);
+    int outputWidth = 0, outputHeight = 0;
+    SDL_GetRendererOutputSize(renderer, &outputWidth, &outputHeight);
+    // Whole-number scales stay sharp. Other scales (720x720, 480x320 screens) are smoothed so text stays readable.
+    const bool wholeScale = outputWidth % host.width == 0 && outputHeight % host.height == 0
+                            && outputWidth / host.width == outputHeight / host.height;
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, wholeScale ? "0" : "1");
+    std::fprintf(stderr, "Display %dx%d, game %dx%d\n", outputWidth, outputHeight, host.width, host.height);
     auto* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, host.width, host.height);
     if (!texture) throw std::runtime_error(SDL_GetError());
 
@@ -315,6 +351,7 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
     bool cursorShown = false, touching = false, mouseDown = false;
     std::uint64_t shownFrame = ~0ull;
     Script script{options, game, host};
+    std::size_t nextWindowShot = 0;
     const auto start = std::chrono::steady_clock::now();
     auto last = start;
 
@@ -362,10 +399,11 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
             case SDL_CONTROLLERBUTTONDOWN: case SDL_CONTROLLERBUTTONUP: {
                 const bool down = event.type == SDL_CONTROLLERBUTTONDOWN;
                 switch (event.cbutton.button) {
-                case SDL_CONTROLLER_BUTTON_DPAD_UP: key(KeyUp, down); break;
-                case SDL_CONTROLLER_BUTTON_DPAD_DOWN: key(KeyDown, down); break;
-                case SDL_CONTROLLER_BUTTON_DPAD_LEFT: key(KeyLeft, down); break;
-                case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: key(KeyRight, down); break;
+                // In D-pad pointer mode the D-pad steers the pointer below instead.
+                case SDL_CONTROLLER_BUTTON_DPAD_UP: if (!options.dpadPointer) key(KeyUp, down); break;
+                case SDL_CONTROLLER_BUTTON_DPAD_DOWN: if (!options.dpadPointer) key(KeyDown, down); break;
+                case SDL_CONTROLLER_BUTTON_DPAD_LEFT: if (!options.dpadPointer) key(KeyLeft, down); break;
+                case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: if (!options.dpadPointer) key(KeyRight, down); break;
                 case SDL_CONTROLLER_BUTTON_A:
                     cursorShown = true;
                     touching = down;
@@ -409,7 +447,14 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
                 const float value = SDL_GameControllerGetAxis(pad, which) / 32767.0f;
                 return std::abs(value) < 0.2f ? 0.0f : value;
             };
-            const float dx = axis(SDL_CONTROLLER_AXIS_LEFTX), dy = axis(SDL_CONTROLLER_AXIS_LEFTY);
+            float dx = axis(SDL_CONTROLLER_AXIS_LEFTX), dy = axis(SDL_CONTROLLER_AXIS_LEFTY);
+            if (options.dpadPointer) {
+                const auto pressed = [&](SDL_GameControllerButton button) { return SDL_GameControllerGetButton(pad, button) ? 1.0f : 0.0f; };
+                dx += pressed(SDL_CONTROLLER_BUTTON_DPAD_RIGHT) - pressed(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+                dy += pressed(SDL_CONTROLLER_BUTTON_DPAD_DOWN) - pressed(SDL_CONTROLLER_BUTTON_DPAD_UP);
+                dx = std::clamp(dx, -1.0f, 1.0f);
+                dy = std::clamp(dy, -1.0f, 1.0f);
+            }
             if (dx != 0 || dy != 0) {
                 const bool slow = SDL_GameControllerGetAxis(pad, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 8000;
                 const float speed = (slow ? 110.0f : 420.0f) * seconds;
@@ -440,6 +485,9 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
             SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
             const SDL_Rect cross[] = {{x - 8, y - 1, 17, 3}, {x - 1, y - 8, 3, 17}};
             SDL_RenderFillRects(renderer, cross, 2);
+        }
+        while (nextWindowShot < options.windowShots.size() && options.windowShots[nextWindowShot].at <= elapsed(start)) {
+            saveWindow(renderer, options.windowShots[nextWindowShot++].path, host);
         }
         SDL_RenderPresent(renderer);
         SDL_Delay(4);
