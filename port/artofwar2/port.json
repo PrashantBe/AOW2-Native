@@ -1,27 +1,33 @@
 {
-    "version": 2,
+    "version": 4,
     "name": "artofwar2.zip",
     "items": [
         "Art of War 2 (Native).sh",
         "artofwar2"
     ],
-    "items_opt": null,
+    "items_opt": [],
     "attr": {
         "title": "Art of War 2: Global Confederation",
-        "desc": "Real-time strategy from the Nokia 5800 era. Build a base, train infantry and vehicles, research upgrades and fight through seven campaign missions. The original game code runs natively on a built-in Java runtime, with no emulator.",
-        "inst": "Copy your ArtOfWar2__Nokia_5800.jar (Nokia 5800 edition, version 1.4.0) into ports/artofwar2/gamedata/.",
-        "genres": [
-            "strategy"
-        ],
         "porter": [
             "PrashantBe"
         ],
-        "image": {},
+        "desc": "Real-time strategy from HeroCraft. Build a base, train infantry and vehicles, research upgrades and fight through seven campaign missions. The original Java ME game runs natively on a small built-in runtime, with no emulator.",
+        "desc_md": null,
+        "inst": "Copy ArtOfWar2__Nokia_5800.jar from your own copy of the Nokia 5800 edition (version 1.4.0) to ports/artofwar2/gamedata/.",
+        "inst_md": null,
+        "genres": [
+            "strategy"
+        ],
+        "image": null,
         "rtr": false,
-        "runtime": null,
+        "exp": false,
+        "runtime": [],
+        "store": [],
+        "availability": "paid",
         "reqs": [],
         "arch": [
             "aarch64"
-        ]
+        ],
+        "min_glibc": "2.29"
     }
 }

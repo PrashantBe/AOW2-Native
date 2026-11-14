@@ -7,6 +7,6 @@ cd "$(dirname "$0")/.."
 rm -rf dist && mkdir -p dist
 cp "port/artofwar2/Art of War 2 (Native).sh" dist/
 cp -r port/artofwar2/artofwar2 dist/
-cp port/artofwar2/port.json port/artofwar2/README.md port/artofwar2/gameinfo.xml port/artofwar2/screenshot.png dist/artofwar2/
+cp port/artofwar2/port.json port/artofwar2/README.md port/artofwar2/gameinfo.xml port/artofwar2/screenshot.png port/artofwar2/cover.png dist/artofwar2/
 cp build-arm64/aow2 dist/artofwar2/aow2.aarch64
 (cd dist && find . -type f | sort)

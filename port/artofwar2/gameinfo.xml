@@ -1,13 +1,13 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="utf-8"?>
 <gameList>
   <game>
     <path>./Art of War 2 (Native).sh</path>
     <name>Art of War 2: Global Confederation</name>
-    <desc>Real-time strategy from the Nokia 5800 era. Build a base, train infantry and vehicles, research upgrades and fight through seven campaign missions.</desc>
+    <desc>Real-time strategy set in 2038, where the Global Confederation fights a growing rebellion across seven campaign missions. Build a base with generators and production buildings, train infantry and vehicles, research upgrades and command your forces against rebel attacks.</desc>
     <releasedate>20100622T000000</releasedate>
     <developer>HeroCraft</developer>
     <publisher>HeroCraft</publisher>
     <genre>Strategy</genre>
-    <image>./artofwar2/screenshot.png</image>
+    <image>./artofwar2/cover.png</image>
   </game>
 </gameList>

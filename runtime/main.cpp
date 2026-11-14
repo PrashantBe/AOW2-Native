@@ -344,7 +344,18 @@ int runWindow(Options& options, Game& game, vm::Host& host) {
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, wholeScale ? "0" : "1");
     std::fprintf(stderr, "Display %dx%d, game %dx%d\n", outputWidth, outputHeight, host.width, host.height);
     auto* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, host.width, host.height);
-    if (!texture) throw std::runtime_error(SDL_GetError());
+    if (!texture) {
+        // Some GLES2 drivers reject streaming textures; the software renderer always accepts them.
+        std::fprintf(stderr, "Accelerated renderer failed (%s), using software rendering\n", SDL_GetError());
+        SDL_DestroyRenderer(renderer);
+        renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
+        if (!renderer) throw std::runtime_error(SDL_GetError());
+        SDL_RenderSetLogicalSize(renderer, host.width, host.height);
+        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, host.width, host.height);
+        if (!texture) throw std::runtime_error(SDL_GetError());
+    }
+    // The game draws its own pointer, and many handhelds show the system cursor as a stray arrow.
+    if (options.fullscreen) SDL_ShowCursor(SDL_DISABLE);
 
     SDL_GameController* pad = nullptr;
     float cursorX = host.width / 2.0f, cursorY = host.height / 2.0f;
