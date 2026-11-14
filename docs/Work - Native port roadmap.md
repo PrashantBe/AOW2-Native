@@ -31,7 +31,7 @@ Work through one numbered item at a time. Add or update its own `docs/Work - {ta
 | 07 | System-font text | The game falls back to the phone's font in a few places (`drawString`). Render it. |
 | 08 | Controls polish — Number keys done | L1, R1 and Select send the phone keys 1 (rally point), 3 (destroy) and 0 (info); R2 + L1/R1 send 7 and 9. Still to tune: pointer speed and edge scrolling on the device. |
 | 09 | Game-data redistribution decision | Contact the rights holder. Without permission, the release stays "bring your own JAR". |
-| 10 | PortMaster package and submission | Port folder is ready in `port/artofwar2`. Still needed: project licence, testing on other firmware, then the pull request. See [Work - Publishing on PortMaster](Work%20-%20Publishing%20on%20PortMaster.md). |
+| 10 | PortMaster package and submission | Port folder is ready in `port/artofwar2`. Still needed: testing on other firmware, then the pull request. See [Work - Publishing on PortMaster](Work%20-%20Publishing%20on%20PortMaster.md). |
 
 ## PortMaster references
 

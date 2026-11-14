@@ -84,3 +84,7 @@ Tested on an RG40XXV with KNULLI: the game plays, including base building, train
 ## Credits
 
 Art of War 2: Global Confederation by [HeroCraft](https://www.herocraft.com). This project contains no code or data from the game.
+
+## Licence
+
+The code in this repository is released under the [MIT License](LICENSE). The game itself is not covered and remains (c) HeroCraft.

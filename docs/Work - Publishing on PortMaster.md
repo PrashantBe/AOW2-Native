@@ -23,23 +23,21 @@ PortMaster wants one folder per port under `ports/`. Ours is [port/artofwar2](..
 | `gameinfo.xml` for EmulationStation | Done |
 | `screenshot.png`, exactly 640×480, showing gameplay | Done |
 | `cover.png` | Optional, not made |
-| `licenses/LICENSE.<component>.txt` for every bundled component | libpng, zlib, libstdc++ are linked in and included. **The project's own licence is still missing.** |
+| `licenses/LICENSE.<component>.txt` for every bundled component | Done: aow2 (MIT), libpng, zlib, libstdc++ |
 | No bundled SDL2, libc or libstdc++ `.so` files | Only SDL2 and libc are needed from the device; nothing bundled |
 | Binary's executable bit set at run time, not on the `.sh` | The launcher runs `chmod +x` on the binary |
 
 ## Submission steps
 
-1. Choose and add a licence for this project's code (for example MIT), and add `LICENSE.aow2.txt` to `licenses/`.
-2. Join the PortMaster Discord (https://discord.gg/eqjK6yNQS4), introduce the port and ask the crew about a "bring your own JAR" Java ME title. Reviewers decide what is accepted.
-3. Test on as many systems as possible. PortMaster lists AmberELEC, dArkOS, MuOS, ROCKNIX and Knulli, at 640×480 and at a higher resolution such as 1280×720. Ports tested on one device only are rejected. So far: Knulli on RG40XXV (H700), 640×480.
-4. Fork `PortsMaster/PortMaster-New` and disable Actions on the fork. Create a feature branch.
-5. Run `tools/prepare_repo.sh`, copy `port/artofwar2/` to `ports/artofwar2/` and add `artofwar2/aow2.aarch64` from `tools/arm64/build.sh`.
-6. Run `python3 tools/build_release.py --do-check` and fix any warnings. The zip it builds in `releases/` is the test build to share on Discord.
-7. Open a pull request. Push fixes to the same PR rather than opening a new one.
+1. Join the PortMaster Discord (https://discord.gg/eqjK6yNQS4), introduce the port and ask the crew about a "bring your own JAR" Java ME title. Reviewers decide what is accepted.
+2. Test on as many systems as possible. PortMaster lists AmberELEC, dArkOS, MuOS, ROCKNIX and Knulli, at 640×480 and at a higher resolution such as 1280×720. Ports tested on one device only are rejected. So far: Knulli on RG40XXV (H700), 640×480.
+3. Fork `PortsMaster/PortMaster-New` and disable Actions on the fork. Create a feature branch.
+4. Run `tools/prepare_repo.sh`, copy `port/artofwar2/` to `ports/artofwar2/` and add `artofwar2/aow2.aarch64` from `tools/arm64/build.sh`.
+5. Run `python3 tools/build_release.py --do-check` and fix any warnings. The zip it builds in `releases/` is the test build to share on Discord.
+6. Open a pull request. Push fixes to the same PR rather than opening a new one.
 
 ## Open items before submitting
 
-- Project licence (owner's decision).
 - Testing on other firmware and a 1280×720 device.
 - A full playthrough of all seven missions and Custom Game.
 - The script name contains parentheses because this handheld already has an `Art of War 2.sh` from the FreeJ2ME experiment. For the submission, `Art of War 2.sh` is the cleaner name.
