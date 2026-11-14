@@ -1,0 +1,29 @@
+# Build output
+/build*/
+/dist/
+
+# Game data and anything derived from the original code. Never publish these.
+*.jar
+*.class
+/reference/
+/assets/
+*.bmp
+
+# Local saves from test runs
+saves/
+
+# The earlier hand-written prototype and its notes, kept only locally
+/src/
+/tests/
+/screenshots/
+/KNULLI-JavaME-Setup.md
+/docs/KNULLI-JavaME-Setup.md
+/docs/Work - Asset loading and map rendering.md
+/docs/Work - Base economy and Generator construction.md
+/docs/Work - Building combat, repair, and destruction.md
+/docs/Work - Combat and Pucallpa objectives.md
+/docs/Work - Infantry production and movement.md
+/docs/Work - Pucallpa campaign opening.md
+/docs/Work - Pucallpa reconnaissance and rebel patrols.md
+/docs/Work - Pucallpa's remaining rebel attack events.md
+/docs/Work - Running the original on KNULLI.md
